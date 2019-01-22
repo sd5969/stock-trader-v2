@@ -7,11 +7,12 @@ from threading import Thread
 import tweepy
 from dotenv import load_dotenv
 from classifier import TweetClassifier
+from datastore import DataAPI
 import logger
 
 load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
 
-_logger = logger.init_logger(logger.get_logger())
+_logger = logger.get_logger()
 
 class TweetStreamListener(tweepy.StreamListener):
     """
@@ -61,9 +62,13 @@ class TweetStream(object):
     def _start(self):
         api = TweetAPI()
 
+        db_interface = DataAPI()
+        db_interface.connect()
+        tickers = db_interface.get_tickers()
+
         stream_listener = TweetStreamListener()
         self.stream = tweepy.Stream(auth=api.auth, listener=stream_listener)
-        self.stream.filter(track=['AAPL', 'NFLX']) # TODO: get this from database
+        self.stream.filter(track=tickers)
 
     def start(self):
         """

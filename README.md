@@ -20,6 +20,10 @@ SST_CONSUMER_KEY="key"
 SST_CONSUMER_SECRET="secret"
 SST_ACCESS_TOKEN="token"
 SST_ACCESS_TOKEN_SECRET="token secret"
+
+SST_DB_USER="user"
+SST_DB_PASSWORD="password"
+SST_DB_URI="uri"
 ```
 
 ## Execution
