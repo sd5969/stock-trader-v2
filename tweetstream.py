@@ -3,6 +3,7 @@ Parses streaming tweets
 """
 
 import os
+from datetime import datetime
 from threading import Thread
 import tweepy
 from dotenv import load_dotenv
@@ -19,9 +20,23 @@ class TweetStreamListener(tweepy.StreamListener):
     Listener for tweets
     """
 
+    def __init__(self, db_interface):
+        super(TweetStreamListener, self).__init__()
+        self.db_interface = db_interface
+        if not self.db_interface.connected:
+            self.db_interface.connect()
+
     def on_status(self, status):
         sentiment_score = TweetClassifier.get_tweet_sentiment(status.text)
-        _logger.debug(("%1.3f " + status.text), sentiment_score)
+        # _logger.debug(("%1.3f " + status.text), sentiment_score)
+        _logger.debug("Tweet found, saving sentiment")
+
+        self.db_interface.store_sentiment({
+            'id': status.id,
+            'timestamp': datetime.fromtimestamp(int(status.timestamp_ms) / 1000),
+            'text': status.text,
+            'sentiment': sentiment_score
+        })
 
 class TweetAPI(object):
     """
@@ -66,7 +81,7 @@ class TweetStream(object):
         db_interface.connect()
         tickers = db_interface.get_tickers()
 
-        stream_listener = TweetStreamListener()
+        stream_listener = TweetStreamListener(db_interface=db_interface)
         self.stream = tweepy.Stream(auth=api.auth, listener=stream_listener)
         self.stream.filter(track=tickers)
 

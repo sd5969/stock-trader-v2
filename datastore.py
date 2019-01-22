@@ -23,6 +23,7 @@ class DataAPI(object):
     def __init__(self):
         self.client = None
         self.database = None
+        self.connected = False
 
     def connect(self):
         """
@@ -33,6 +34,7 @@ class DataAPI(object):
         + "@" + _MONGODB_URI)
         _logger.info("connection to db successful")
         self.database = self.client['sentiment-stock-trader']
+        self.connected = True
 
     def get_tickers(self):
         """
@@ -47,3 +49,21 @@ class DataAPI(object):
             tickers_array.append(ticker['symbol'])
 
         return tickers_array
+
+    def store_sentiment(self, sentiment):
+        """
+        Stores sentiment from tweet
+        """
+
+        tickers = self.database['tickers'].find()
+        sentiments = self.database['sentiments']
+
+        for ticker in tickers:
+            if ticker['symbol'].upper() in sentiment['text'].upper():
+                sentiments.insert_one({
+                    'id': sentiment['id'],
+                    'timestamp': sentiment['timestamp'],
+                    'text': sentiment['text'],
+                    'sentiment': sentiment['sentiment'],
+                    'ticker': ticker['_id']
+                })
