@@ -3,7 +3,7 @@ Parses streaming tweets
 """
 
 import os
-from datetime import datetime
+from datetime import datetime, date, time
 from threading import Thread
 import tweepy
 from dotenv import load_dotenv
@@ -32,8 +32,11 @@ class TweetStreamListener(tweepy.StreamListener):
         _logger.debug("Tweet found, saving sentiment")
 
         self.db_interface.store_sentiment({
-            'id': status.id,
-            'timestamp': datetime.fromtimestamp(int(status.timestamp_ms) / 1000),
+            # 'id': status.id,
+            'date': datetime.combine( \
+                date.fromtimestamp(int(status.timestamp_ms) / 1000), \
+                time() \
+            ),
             'text': status.text,
             'sentiment': sentiment_score
         })

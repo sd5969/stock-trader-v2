@@ -41,7 +41,9 @@ class DataAPI(object):
         Get ticker symbols
         """
 
-        tickers = self.database['tickers'].find()
+        tickers = self.database['tickers'].find({
+            'active': True
+        })
         _logger.info("got all ticker data")
 
         tickers_array = []
@@ -55,15 +57,19 @@ class DataAPI(object):
         Stores sentiment from tweet
         """
 
-        tickers = self.database['tickers'].find()
+        tickers = self.database['tickers'].find({
+            'active': True
+        })
         sentiments = self.database['sentiments']
 
         for ticker in tickers:
             if ticker['symbol'].upper() in sentiment['text'].upper():
-                sentiments.insert_one({
-                    'id': sentiment['id'],
-                    'timestamp': sentiment['timestamp'],
-                    'text': sentiment['text'],
-                    'sentiment': sentiment['sentiment'],
-                    'ticker': ticker['_id']
-                })
+                sentiments.update_one({
+                    'ticker': ticker['_id'],
+                    'date': sentiment['date']
+                }, {
+                    '$inc': {
+                        'count': 1,
+                        'sentiment': sentiment['sentiment']
+                    }
+                }, upsert=True)
