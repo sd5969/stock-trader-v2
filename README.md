@@ -9,11 +9,15 @@ This project is an attempt to classify stock-related tweets in order to predict 
 We are using `python3.7`.
 
 ```bash
+cd monitor
 pip3 install -r requirements.txt
 python3 -m textblob.download_corpora
+
+cd ../trade
+pip3 install -r requirements.txt
 ```
 
-Add your Twitter API data to a `.env` file in the root directory.
+Add your Twitter API data to a `.env` file in the `monitor` and `trade` directories.
 
 ```bash
 
@@ -37,6 +41,14 @@ AL_SECRET="secret"
 
 ## Execution
 
+Execute the tweet monitoring application:
+
 ```bash
-python3 main.py
+python3 monitor/main.py
+```
+
+Execute the trade application:
+
+```bash
+python3 trade/main.py
 ```

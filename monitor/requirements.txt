@@ -2,4 +2,3 @@ tweepy==3.7.0
 textblob==0.15.2
 python-dotenv==0.10.1
 pymongo==3.7.2
-alpaca-trade-api==0.24
