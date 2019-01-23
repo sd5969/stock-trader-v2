@@ -63,7 +63,9 @@ class DataAPI(object):
         sentiments = self.database['sentiments']
 
         for ticker in tickers:
-            if ticker['symbol'].upper() in sentiment['text'].upper():
+            matches_tweet = '#' + ticker['symbol'].upper() + ' ' in \
+                sentiment['text'].upper() + ' '
+            if matches_tweet:
                 sentiments.update_one({
                     'ticker': ticker['_id'],
                     'date': sentiment['date']
