@@ -36,7 +36,7 @@ class DataAPI(object):
         self.database = self.client['sentiment-stock-trader']
         self.connected = True
 
-    def get_tickers(self):
+    def get_tickers_array(self):
         """
         Get ticker symbols
         """

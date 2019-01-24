@@ -82,7 +82,7 @@ class TweetStream(object):
 
         db_interface = DataAPI()
         db_interface.connect()
-        tickers = map(lambda a: '#' + a, db_interface.get_tickers())
+        tickers = map(lambda a: '#' + a, db_interface.get_tickers_array())
 
         stream_listener = TweetStreamListener(db_interface=db_interface)
         self.stream = tweepy.Stream(auth=api.auth, listener=stream_listener)
