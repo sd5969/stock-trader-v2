@@ -5,7 +5,7 @@ Reusable logging functions
 import logging
 import sys
 
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.DEBUG
 
 def get_logger():
     """

@@ -47,6 +47,11 @@ def main():
     data_api = DataAPI()
     data_api.connect()
 
+    # skip all behavior if market is closed
+    if not trader.market_is_open():
+        _logger.info("Market is closed, no trading will occur")
+        return
+
     yesterday = datetime.combine( \
         date.today() - timedelta(days=1), \
         datetime_time() \

@@ -25,6 +25,13 @@ class Trader():
             base_url=os.getenv('AL_ENDPOINT')
         )
 
+    def market_is_open(self):
+        """
+        Returns true if market is open
+        """
+
+        return self.api.get_clock().is_open
+
     def get_positions(self):
         """
         Returns list of all positions
