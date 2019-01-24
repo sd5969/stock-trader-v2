@@ -3,12 +3,13 @@ Trading interface
 """
 
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import alpaca_trade_api as tradeapi
 import logger
 from exceptions import InsufficientArgumentsError
 
-load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+# load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+load_dotenv(find_dotenv())
 
 _logger = logger.get_logger()
 

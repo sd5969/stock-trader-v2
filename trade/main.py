@@ -5,12 +5,13 @@ Code for executing simple trading algorithm
 import os
 from datetime import datetime, date, timedelta, time as datetime_time
 import time
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import logger
 from trader import Trader
 from datastore import DataAPI
 
-load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+# load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+load_dotenv(find_dotenv())
 
 _logger = logger.init_logger(logger.get_logger())
 LOOP_WAIT_TIME = 5 # seconds
@@ -66,10 +67,10 @@ def main():
 
     sell_orders = []
     for position in prev_positions:
-        if position['symbol'] not in tickers_to_hold:
+        if position.symbol not in tickers_to_hold:
             sell_orders.append({
-                'symbol': position['symbol'],
-                'qty': position['qty'],
+                'symbol': position.symbol,
+                'qty': position.qty,
                 'side': 'sell',
                 'type': 'market',
                 'time_in_force': 'day'
@@ -89,8 +90,10 @@ def main():
             'type': 'market',
             'time_in_force': 'day'
         })
+    _logger.debug(buy_orders)
 
     orders = trader.submit_orders(buy_orders)
+    _logger.debug(orders)
     await_orders(trader, orders)
 
     _logger.info("All buy orders (if any) complete")

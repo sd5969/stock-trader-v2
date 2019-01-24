@@ -5,10 +5,11 @@ Interface with database
 import os
 from datetime import datetime, time
 from pymongo import MongoClient
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import logger
 
-load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+# load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+load_dotenv(find_dotenv())
 
 _logger = logger.get_logger()
 

@@ -6,12 +6,13 @@ import os
 from datetime import datetime, date, time
 from threading import Thread
 import tweepy
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from classifier import TweetClassifier
 from datastore import DataAPI
 import logger
 
-load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+# load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
+load_dotenv(find_dotenv())
 
 _logger = logger.get_logger()
 
