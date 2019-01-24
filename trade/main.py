@@ -2,7 +2,6 @@
 Code for executing simple trading algorithm
 """
 
-import os
 from datetime import datetime, date, timedelta, time as datetime_time
 import time
 from dotenv import load_dotenv, find_dotenv
@@ -66,6 +65,7 @@ def main():
     prev_positions = trader.get_positions()
 
     sell_orders = []
+    tickers_held = []
     for position in prev_positions:
         if position.symbol not in tickers_to_hold:
             sell_orders.append({
@@ -75,6 +75,8 @@ def main():
                 'type': 'market',
                 'time_in_force': 'day'
             })
+        else:
+            tickers_held.append(position.symbol)
 
     orders = trader.submit_orders(sell_orders)
     await_orders(trader, orders)
@@ -83,13 +85,14 @@ def main():
 
     buy_orders = []
     for ticker in tickers_to_hold:
-        buy_orders.append({
-            'symbol': ticker,
-            'qty': BUY_COUNT,
-            'side': 'buy',
-            'type': 'market',
-            'time_in_force': 'day'
-        })
+        if ticker not in tickers_held:
+            buy_orders.append({
+                'symbol': ticker,
+                'qty': BUY_COUNT,
+                'side': 'buy',
+                'type': 'market',
+                'time_in_force': 'day'
+            })
     _logger.debug(buy_orders)
 
     orders = trader.submit_orders(buy_orders)

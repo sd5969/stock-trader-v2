@@ -3,7 +3,6 @@ Interface with database
 """
 
 import os
-from datetime import datetime, time
 from pymongo import MongoClient
 from dotenv import load_dotenv, find_dotenv
 import logger
