@@ -119,3 +119,21 @@ class DataAPI():
 
 
         return list(sentiments)
+
+    def update_positions(self, tag, orders):
+        """
+        Store order changes to db
+        """
+
+        for order in orders:
+            self.database['positions'].update({
+                'tag': tag,
+                'symbol': order['symbol']
+            }, {
+                '$inc': {
+                    'qty': (1 if order['side'] == 'buy' else -1) * order['qty']
+                }
+            }, {
+                'upsert': True,
+                'multi': True
+            })
