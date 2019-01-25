@@ -133,7 +133,4 @@ class DataAPI():
                 '$inc': {
                     'qty': (1 if order['side'] == 'buy' else -1) * order['qty']
                 }
-            }, {
-                'upsert': True,
-                'multi': True
-            })
+            }, upsert=True, multi=True)
