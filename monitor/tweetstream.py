@@ -34,9 +34,9 @@ class TweetStreamListener(tweepy.StreamListener):
 
         self.db_interface.store_sentiment({
             # 'id': status.id,
-            'date': datetime.combine( \
-                date.fromtimestamp(int(status.timestamp_ms) / 1000), \
-                time() \
+            'date': datetime.combine(
+                date.fromtimestamp(int(status.timestamp_ms) / 1000),
+                time()
             ),
             'text': status.text,
             'sentiment': sentiment_score

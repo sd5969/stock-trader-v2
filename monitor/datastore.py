@@ -31,7 +31,7 @@ class DataAPI(object):
         Connect to DB
         """
 
-        self.client = MongoClient("mongodb://" + _MONGODB_USER + ":" + _MONGODB_PASSWORD \
+        self.client = MongoClient("mongodb://" + _MONGODB_USER + ":" + _MONGODB_PASSWORD
         + "@" + _MONGODB_URI)
         _logger.info("connection to db successful")
         self.database = self.client['sentiment-stock-trader']
@@ -57,6 +57,8 @@ class DataAPI(object):
         """
         Stores sentiment from tweet
         """
+
+        # TODO: change code to store ticker symbol instead of FK (unnecessary complexity)
 
         tickers = self.database['tickers'].find({
             'active': True

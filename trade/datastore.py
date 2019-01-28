@@ -31,7 +31,7 @@ class DataAPI():
         Connect to DB
         """
 
-        self.client = MongoClient("mongodb://" + _MONGODB_USER + ":" + _MONGODB_PASSWORD \
+        self.client = MongoClient("mongodb://" + _MONGODB_USER + ":" + _MONGODB_PASSWORD
         + "@" + _MONGODB_URI)
         _logger.info("connection to db successful")
         self.database = self.client['sentiment-stock-trader']
@@ -52,6 +52,19 @@ class DataAPI():
             tickers_by_id[ticker['_id']] = ticker['symbol']
 
         return tickers_by_id
+
+    def get_tickers_name(self):
+        """
+        Get ticker record's symbols
+        """
+
+        tickers = self.get_tickers_dict()
+
+        tickers_names = []
+        for ticker in tickers:
+            tickers_names.append(tickers[ticker])
+
+        return tickers_names
 
     def get_tickers_id(self):
         """
@@ -134,3 +147,18 @@ class DataAPI():
                     'qty': (1 if order['side'] == 'buy' else -1) * order['qty']
                 }
             }, upsert=True, multi=True)
+
+        # remove empty positions
+
+        self.database['positions'].delete_many({
+            'qty': 0
+        })
+
+    def get_positions(self, tag):
+        """
+        Gets positions for a specified tag
+        """
+
+        return self.database['positions'].find({
+            'tag': tag
+        })

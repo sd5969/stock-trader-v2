@@ -15,6 +15,7 @@ load_dotenv(find_dotenv())
 _logger = logger.get_logger()
 
 LOOP_WAIT_TIME = 5 # seconds
+BARS_API_LIMIT = 200
 
 class Trader():
     """
@@ -52,8 +53,8 @@ class Trader():
             not order['side'] or \
             not order['type'] or \
             not order['time_in_force']:
-            raise InsufficientArgumentsError( \
-                "Symbol, Quantity, Side, Type, and Time in Force must be specified." \
+            raise InsufficientArgumentsError(
+                "Symbol, Quantity, Side, Type, and Time in Force must be specified."
             )
 
         return self.api.submit_order(symbol=order['symbol'], \
@@ -130,3 +131,17 @@ class Trader():
                     orders.pop(index)
 
             all_orders_complete = (not orders)
+
+    def get_bars(self, tickers, timeframe, start, end):
+        """
+        Gets bars with specified arguments
+        """
+
+        index = 0
+        results = {}
+        while len(tickers) > index:
+            tickers_subset = tickers[index:index + BARS_API_LIMIT]
+            results.update(self.api.get_barset(tickers_subset, timeframe, start=start, end=end))
+            index += BARS_API_LIMIT
+
+        return results

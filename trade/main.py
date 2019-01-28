@@ -22,6 +22,8 @@ def main():
     data_api = DataAPI()
     data_api.connect()
 
+    # HeikinAshiAlgorithm.execute(trader, data_api)
+
     # skip all behavior if market is closed
     if not trader.market_is_open():
         _logger.info("Market is closed, no trading will occur")
