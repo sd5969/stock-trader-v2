@@ -30,6 +30,7 @@ def main():
         return
 
     SentimentAlgorithm.execute(trader, data_api)
+    HeikinAshiAlgorithm.execute(trader, data_api)
 
 if __name__ == "__main__":
     # calling main function

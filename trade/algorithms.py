@@ -239,7 +239,7 @@ class HeikinAshiAlgorithm():
                     'time_in_force': 'day'
                 })
 
-        # orders_result = trader.submit_orders(orders)
+        orders_result = trader.submit_orders(orders)
         _logger.debug(orders)
-        # trader.await_orders(orders)
-        # data_api.update_positions(tag='HA', orders=orders)
+        trader.await_orders(orders)
+        data_api.update_positions(tag='HA', orders=orders)
