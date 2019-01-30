@@ -7,7 +7,7 @@ import time
 from dotenv import load_dotenv, find_dotenv
 import alpaca_trade_api as tradeapi
 import logger
-from exceptions import InsufficientArgumentsError
+from exceptions import InsufficientArgumentsError, InsufficientFundsError, InvalidOrderError
 
 # load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
 load_dotenv(find_dotenv())
@@ -48,21 +48,44 @@ class Trader():
         Submits one order
         """
 
+        response = {
+            'success': False,
+            'error': None,
+            'order': None
+        }
+
         if not order['symbol'] or \
             not order['qty'] or \
             not order['side'] or \
             not order['type'] or \
             not order['time_in_force']:
-            raise InsufficientArgumentsError(
+            response['error'] = InsufficientArgumentsError(
                 "Symbol, Quantity, Side, Type, and Time in Force must be specified."
             )
+            return response
 
-        return self.api.submit_order(symbol=order['symbol'], \
-            qty=order['qty'], \
-            side=order['side'], \
-            type=order['type'], \
-            time_in_force=order['time_in_force'] \
-        )
+        try:
+            order = self.api.submit_order(symbol=order['symbol'], \
+                qty=order['qty'], \
+                side=order['side'], \
+                type=order['type'], \
+                time_in_force=order['time_in_force'] \
+            )
+            response['success'] = True
+            response['order'] = order
+
+        except tradeapi.rest.APIError as err:
+            if err.status_code == 422:
+                response['error'] = InvalidOrderError(
+                    "Order requested is not valid: " + err.response
+                )
+
+            if err.status_code == 403:
+                response['error'] = InsufficientFundsError(
+                    "Insufficient funds to process order: " + err.response
+                )
+
+        return response
 
     def submit_orders(self, orders):
         """
@@ -71,7 +94,9 @@ class Trader():
 
         order_results = []
         for order in orders:
-            order_results.append(self.submit_order(order))
+            order_result = self.submit_order(order)
+            order_result.update(order)
+            order_results.append(order_result)
 
         return order_results
 
@@ -89,10 +114,11 @@ class Trader():
 
         statuses = []
         for order in orders:
-            statuses.append({
-                'order_id': order.id,
-                'status': self.get_order_status(order.id)
-            })
+            if order['success']:
+                statuses.append({
+                    'order_id': order['order'].id,
+                    'status': self.get_order_status(order['order'].id)
+                })
 
         return statuses
 
@@ -127,7 +153,10 @@ class Trader():
                     orders_complete.append(status['order_id'])
 
             for index, order in reversed(list(enumerate(orders))):
-                if order.id in orders_complete:
+                if not order['success']:
+                    orders.pop(index)
+
+                elif order['order'].id in orders_complete:
                     orders.pop(index)
 
             all_orders_complete = (not orders)

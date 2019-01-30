@@ -139,14 +139,15 @@ class DataAPI():
         """
 
         for order in orders:
-            self.database['positions'].update({
-                'tag': tag,
-                'symbol': order['symbol']
-            }, {
-                '$inc': {
-                    'qty': (1 if order['side'] == 'buy' else -1) * order['qty']
-                }
-            }, upsert=True, multi=True)
+            if order['success']:
+                self.database['positions'].update({
+                    'tag': tag,
+                    'symbol': order['symbol']
+                }, {
+                    '$inc': {
+                        'qty': (1 if order['side'] == 'buy' else -1) * order['qty']
+                    }
+                }, upsert=True, multi=True)
 
         # remove empty positions
 

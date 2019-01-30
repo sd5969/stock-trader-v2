@@ -67,7 +67,7 @@ class SentimentAlgorithm():
 
         orders = trader.submit_orders(sell_orders)
         trader.await_orders(orders)
-        data_api.update_positions(tag='S', orders=sell_orders)
+        data_api.update_positions(tag='S', orders=orders)
 
         _logger.info("All sell orders (if any) complete")
 
@@ -88,7 +88,7 @@ class SentimentAlgorithm():
         orders = trader.submit_orders(buy_orders)
         _logger.debug(orders)
         trader.await_orders(orders)
-        data_api.update_positions(tag='S', orders=buy_orders)
+        data_api.update_positions(tag='S', orders=orders)
 
         _logger.info("All buy orders (if any) complete")
 
@@ -240,6 +240,6 @@ class HeikinAshiAlgorithm():
                 })
 
         orders_result = trader.submit_orders(orders)
-        _logger.debug(orders)
-        trader.await_orders(orders)
-        data_api.update_positions(tag='HA', orders=orders)
+        # _logger.debug(orders)
+        trader.await_orders(orders_result)
+        data_api.update_positions(tag='HA', orders=orders_result)
