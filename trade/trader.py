@@ -65,25 +65,28 @@ class Trader():
             return response
 
         try:
-            order = self.api.submit_order(symbol=order['symbol'], \
+            order_result = self.api.submit_order(symbol=order['symbol'], \
                 qty=order['qty'], \
                 side=order['side'], \
                 type=order['type'], \
                 time_in_force=order['time_in_force'] \
             )
             response['success'] = True
-            response['order'] = order
+            response['order'] = order_result
 
         except tradeapi.rest.APIError as err:
             if err.status_code == 422:
                 response['error'] = InvalidOrderError(
-                    "Order requested is not valid: " + err.response
+                    "Order requested is not valid: " + str(err)
                 )
 
             if err.status_code == 403:
                 response['error'] = InsufficientFundsError(
-                    "Insufficient funds to process order: " + err.response
+                    "Insufficient funds to process order: " + str(err)
                 )
+
+        if not response['success']:
+            _logger.warn("Trade failed for " + order['symbol'] + ". Error was " + str(response['error']))
 
         return response
 
@@ -94,9 +97,7 @@ class Trader():
 
         order_results = []
         for order in orders:
-            order_result = self.submit_order(order)
-            order_result.update(order)
-            order_results.append(order_result)
+            order_results.append(self.submit_order(order))
 
         return order_results
 

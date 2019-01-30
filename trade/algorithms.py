@@ -66,10 +66,11 @@ class SentimentAlgorithm():
                 tickers_held.append(position['symbol'])
 
         orders = trader.submit_orders(sell_orders)
-        trader.await_orders(orders)
+        _logger.debug("S Sell Orders: " + str(orders))
+        trader.await_orders(orders.copy())
         data_api.update_positions(tag='S', orders=orders)
 
-        _logger.info("All sell orders (if any) complete")
+        _logger.info("All S sell orders (if any) complete")
 
         # buy new positions based on sentiments
 
@@ -86,11 +87,11 @@ class SentimentAlgorithm():
         _logger.debug(buy_orders)
 
         orders = trader.submit_orders(buy_orders)
-        _logger.debug(orders)
-        trader.await_orders(orders)
+        trader.await_orders(orders.copy())
+        _logger.debug("S Buy Orders: " + str(orders))
         data_api.update_positions(tag='S', orders=orders)
 
-        _logger.info("All buy orders (if any) complete")
+        _logger.info("All S buy orders (if any) complete")
 
 class HeikinAshiAlgorithm():
     """
@@ -241,5 +242,7 @@ class HeikinAshiAlgorithm():
 
         orders_result = trader.submit_orders(orders)
         # _logger.debug(orders)
-        trader.await_orders(orders_result)
+        trader.await_orders(orders_result.copy())
         data_api.update_positions(tag='HA', orders=orders_result)
+
+        _logger.info("All HA trades (if any) complete")

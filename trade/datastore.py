@@ -138,16 +138,18 @@ class DataAPI():
         Store order changes to db
         """
 
+        _logger.debug(orders)
+
         for order in orders:
             if order['success']:
-                self.database['positions'].update({
+                _logger.debug(self.database['positions'].update({
                     'tag': tag,
-                    'symbol': order['symbol']
+                    'symbol': order['order'].symbol
                 }, {
                     '$inc': {
-                        'qty': (1 if order['side'] == 'buy' else -1) * order['qty']
+                        'qty': (1 if order['order'].side == 'buy' else -1) * int(order['order'].qty)
                     }
-                }, upsert=True, multi=True)
+                }, upsert=True, multi=True))
 
         # remove empty positions
 
