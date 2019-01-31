@@ -2,6 +2,7 @@
 Code for executing simple trading algorithm
 """
 
+from datetime import date
 from dotenv import load_dotenv, find_dotenv
 import logger
 from trader import Trader
@@ -29,8 +30,8 @@ def main():
         _logger.info("Market is closed, no trading will occur")
         return
 
-    SentimentAlgorithm.execute(trader, data_api)
-    HeikinAshiAlgorithm.execute(trader, data_api)
+    SentimentAlgorithm.execute(trader, data_api, date.today())
+    HeikinAshiAlgorithm.execute(trader, data_api, date.today())
 
 if __name__ == "__main__":
     # calling main function

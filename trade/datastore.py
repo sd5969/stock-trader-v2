@@ -21,10 +21,11 @@ class DataAPI():
     Interface with database
     """
 
-    def __init__(self):
+    def __init__(self, positions_table_name='positions'):
         self.client = None
         self.database = None
         self.connected = False
+        self.positions_table_name = positions_table_name
 
     def connect(self):
         """
@@ -142,7 +143,7 @@ class DataAPI():
 
         for order in orders:
             if order['success']:
-                _logger.debug(self.database['positions'].update({
+                _logger.debug(self.database[self.positions_table_name].update({
                     'tag': tag,
                     'symbol': order['order'].symbol
                 }, {
@@ -153,7 +154,7 @@ class DataAPI():
 
         # remove empty positions
 
-        self.database['positions'].delete_many({
+        self.database[self.positions_table_name].delete_many({
             'qty': 0
         })
 
@@ -162,6 +163,15 @@ class DataAPI():
         Gets positions for a specified tag
         """
 
-        return self.database['positions'].find({
+        return self.database[self.positions_table_name].find({
+            'tag': tag
+        })
+
+    def reset_positions(self, tag):
+        """
+        Clears positions table
+        """
+
+        self.database[self.positions_table_name].delete_many({
             'tag': tag
         })

@@ -15,6 +15,7 @@ load_dotenv(find_dotenv())
 _logger = logger.get_logger()
 
 LOOP_WAIT_TIME = 5 # seconds
+MAX_WAIT_TIME = 300 # seconds
 BARS_API_LIMIT = 200
 
 class Trader():
@@ -143,9 +144,11 @@ class Trader():
         """
 
         all_orders_complete = (not orders)
+        wait_time = 0
 
-        while not all_orders_complete:
+        while not all_orders_complete and wait_time < MAX_WAIT_TIME:
             time.sleep(LOOP_WAIT_TIME)
+            wait_time += LOOP_WAIT_TIME
 
             orders_statuses = self.get_orders_status(orders)
             orders_complete = []
@@ -161,6 +164,28 @@ class Trader():
                     orders.pop(index)
 
             all_orders_complete = (not orders)
+
+        if not all_orders_complete:
+            self.cancel_orders(orders)
+            _logger.warn("Not all orders filled, %d cancelled", len(orders))
+
+    def cancel_order(self, order_id):
+        """
+        Cancels order
+        """
+
+        return self.api.cancel_order(order_id)
+
+    def cancel_orders(self, orders):
+        """
+        Cancels orders
+        """
+
+        results = []
+        for order in orders:
+            results.append(self.cancel_order(order['order'].id))
+
+        return results
 
     def get_bars(self, tickers, timeframe, start, end):
         """

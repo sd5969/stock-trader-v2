@@ -21,15 +21,13 @@ class SentimentAlgorithm():
     HOLD_COUNT = 5
 
     @staticmethod
-    def execute(trader, data_api):
+    def execute(trader, data_api, trading_date):
         """
         Executes trade algorithm
         """
 
-        # TODO: store relevant positions in DB
-
         yesterday = datetime.combine(
-            date.today() - timedelta(days=1),
+            trading_date - timedelta(days=1),
             datetime_time()
         )
 
@@ -41,7 +39,7 @@ class SentimentAlgorithm():
         # identify tickers to hold based on best sentiments
 
         tickers_to_hold = []
-        for i in range(SentimentAlgorithm.HOLD_COUNT):
+        for i in range(min(len(sentiments), SentimentAlgorithm.HOLD_COUNT)):
             ticker_id = sentiments[i]['_id']
             tickers_to_hold.append(tickers_dict[ticker_id])
 
@@ -101,7 +99,7 @@ class HeikinAshiAlgorithm():
     BUY_COUNT = 2
 
     @staticmethod
-    def execute(trader, data_api):
+    def execute(trader, data_api, trading_date):
         """
         Executes trade algorithm
         """
@@ -130,12 +128,12 @@ class HeikinAshiAlgorithm():
         # calculate HA data for previous year (always recompute, never store)
 
         one_year_ago = datetime.combine(
-            date.today() - timedelta(days=365),
+            trading_date - timedelta(days=365),
             datetime_time()
         )
 
         yesterday = datetime.combine(
-            date.today() - timedelta(days=1),
+            trading_date - timedelta(days=1),
             datetime_time()
         )
 
@@ -223,22 +221,36 @@ class HeikinAshiAlgorithm():
             # our algorithm only does long trades
 
             if is_long_buy:
-                orders.append({
-                    'symbol': ticker,
-                    'qty': HeikinAshiAlgorithm.BUY_COUNT,
-                    'side': 'buy',
-                    'type': 'market',
-                    'time_in_force': 'day'
-                })
+                _logger.debug(
+                    "Long buy found for %s (stock currently %s)",
+                    ticker,
+                    ("held" if ticker in active_position_tickers else "not held")
+                )
 
-            if is_long_sell and ticker in active_position_tickers:
-                orders.append({
-                    'symbol': ticker,
-                    'qty': active_positions_dict[ticker],
-                    'side': 'sell',
-                    'type': 'market',
-                    'time_in_force': 'day'
-                })
+                if ticker not in active_position_tickers:
+                    orders.append({
+                        'symbol': ticker,
+                        'qty': HeikinAshiAlgorithm.BUY_COUNT,
+                        'side': 'buy',
+                        'type': 'market',
+                        'time_in_force': 'day'
+                    })
+
+            if is_long_sell:
+                _logger.debug(
+                    "Long sell found for %s (stock currently %s)",
+                    ticker,
+                    ("held" if ticker in active_position_tickers else "not held")
+                )
+
+                if ticker in active_position_tickers:
+                    orders.append({
+                        'symbol': ticker,
+                        'qty': active_positions_dict[ticker],
+                        'side': 'sell',
+                        'type': 'market',
+                        'time_in_force': 'day'
+                    })
 
         orders_result = trader.submit_orders(orders)
         # _logger.debug(orders)
