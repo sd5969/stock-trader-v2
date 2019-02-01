@@ -2,7 +2,8 @@
 Code for simulating trading algorithms
 """
 
-from datetime import date, timedelta
+import locale
+from datetime import datetime, date, timedelta, time as datetime_time
 from dotenv import load_dotenv, find_dotenv
 import logger
 from trade_simulator import TradeSimulator
@@ -13,6 +14,7 @@ from algorithms import HeikinAshiAlgorithm
 load_dotenv(find_dotenv())
 
 _logger = logger.init_logger(logger.get_logger())
+locale.setlocale(locale.LC_ALL, '')
 
 def daterange(date1, date2):
     """
@@ -42,10 +44,27 @@ def main():
     date_range = daterange(START_DATE, END_DATE)
     for date_entry in date_range:
         _logger.info("Simulating Heikin-Ashi on %s", date_entry)
+        trader.set_date(
+            datetime.combine(
+                date_entry,
+                datetime_time()
+            )
+        )
         HeikinAshiAlgorithm.execute(trader, data_api, date_entry)
+        _logger.info(
+            "Current profit: %s (%d%%)",
+            locale.currency(trader.get_profit(), grouping=True),
+            (100 * trader.get_profit_percent())
+        )
+
+    trader.clear_positions()
 
     _logger.info("Date range: %s to %s", START_DATE, END_DATE)
-    _logger.info("Total profit: $%d (%d%%)", trader.get_profit(), (100 * trader.get_profit_percent()))
+    _logger.info(
+        "Total profit: %s (%d%%)",
+        locale.currency(trader.get_profit(), grouping=True),
+        (100 * trader.get_profit_percent())
+    )
 
     data_api.reset_positions(tag='HA')
 

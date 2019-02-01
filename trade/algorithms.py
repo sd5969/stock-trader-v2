@@ -91,6 +91,16 @@ class SentimentAlgorithm():
 
         _logger.info("All S buy orders (if any) complete")
 
+
+
+
+
+
+
+
+
+
+
 class HeikinAshiAlgorithm():
     """
     Static class to store Heikin-Ashi trade algorithm
@@ -140,8 +150,8 @@ class HeikinAshiAlgorithm():
         bars = trader.get_bars(
             active_tickers,
             timeframe='day',
-            start=str(one_year_ago.timestamp()),
-            end=str(yesterday.timestamp())
+            start=one_year_ago,
+            end=yesterday
         )
 
         _logger.info("got ticker bars")

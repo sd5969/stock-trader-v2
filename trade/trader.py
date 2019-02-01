@@ -87,7 +87,7 @@ class Trader():
                 )
 
         if not response['success']:
-            _logger.warn("Trade failed for " + order['symbol'] + ". Error was " + str(response['error']))
+            _logger.warning("Trade failed for %s. Error was %s", order['symbol'], str(response['error']))
 
         return response
 
@@ -167,7 +167,7 @@ class Trader():
 
         if not all_orders_complete:
             self.cancel_orders(orders)
-            _logger.warn("Not all orders filled, %d cancelled", len(orders))
+            _logger.warning("Not all orders filled, %d cancelled", len(orders))
 
     def cancel_order(self, order_id):
         """
@@ -187,16 +187,37 @@ class Trader():
 
         return results
 
+    def clear_positions(self):
+        """
+        Sells off remaining positions
+        """
+
+        open_positions = self.get_positions()
+        orders = []
+        for position in open_positions:
+            orders.append({
+                'symbol': position['symbol'],
+                'qty': position['qty'],
+                'side': 'sell',
+                'type': 'market',
+                'time_in_force': 'day'
+            })
+
+        return self.submit_orders(orders)
+
     def get_bars(self, tickers, timeframe, start, end):
         """
         Gets bars with specified arguments
         """
 
+        start_str = str(start.timestamp())
+        end_str = str(end.timestamp())
+
         index = 0
         results = {}
         while len(tickers) > index:
             tickers_subset = tickers[index:index + BARS_API_LIMIT]
-            results.update(self.api.get_barset(tickers_subset, timeframe, start=start, end=end))
+            results.update(self.api.get_barset(tickers_subset, timeframe, start=start_str, end=end_str))
             index += BARS_API_LIMIT
 
         return results
