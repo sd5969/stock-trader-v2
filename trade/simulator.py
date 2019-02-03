@@ -24,8 +24,8 @@ def daterange(date1, date2):
     for n in range(int ((date2 - date1).days)+1):
         yield date1 + timedelta(n)
 
-START_DATE = date.today() - timedelta(days=365)
-END_DATE = date.today()
+START_DATE = date(2018, 12, 3)
+END_DATE = date(2018, 12, 24)
 
 def main():
     """
@@ -57,7 +57,7 @@ def main():
             (100 * trader.get_profit_percent())
         )
 
-    trader.clear_positions()
+    trader.clear_positions(data_api.get_positions(tag='HA'))
 
     _logger.info("Date range: %s to %s", START_DATE, END_DATE)
     _logger.info(

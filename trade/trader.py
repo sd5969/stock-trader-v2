@@ -5,6 +5,7 @@ Trading interface
 import os
 import time
 from dotenv import load_dotenv, find_dotenv
+import pandas as pd
 import alpaca_trade_api as tradeapi
 import logger
 from exceptions import InsufficientArgumentsError, InsufficientFundsError, InvalidOrderError
@@ -187,12 +188,22 @@ class Trader():
 
         return results
 
-    def clear_positions(self):
+    def clear_positions(self, positions=None):
         """
         Sells off remaining positions
         """
 
-        open_positions = self.get_positions()
+        open_positions = []
+        if positions:
+            open_positions = positions
+        else:
+            positions_temp = self.get_positions()
+            for position in positions_temp:
+                open_positions.append({
+                    'symbol': position.symbol,
+                    'qty': position.qty
+                })
+
         orders = []
         for position in open_positions:
             orders.append({
@@ -203,6 +214,8 @@ class Trader():
                 'time_in_force': 'day'
             })
 
+        _logger.debug("Clear positions order: %s", orders)
+
         return self.submit_orders(orders)
 
     def get_bars(self, tickers, timeframe, start, end):
@@ -210,14 +223,20 @@ class Trader():
         Gets bars with specified arguments
         """
 
-        start_str = str(start.timestamp())
-        end_str = str(end.timestamp())
+        start_str = pd.Timestamp(start).isoformat() + '-05:00'
+        end_str = pd.Timestamp(end).isoformat() + '-05:00'
 
         index = 0
         results = {}
         while len(tickers) > index:
             tickers_subset = tickers[index:index + BARS_API_LIMIT]
-            results.update(self.api.get_barset(tickers_subset, timeframe, start=start_str, end=end_str))
+            results.update(self.api.get_barset(
+                tickers_subset,
+                timeframe,
+                start=start_str,
+                end=end_str,
+                limit=1000
+            ))
             index += BARS_API_LIMIT
 
         return results

@@ -154,7 +154,7 @@ class HeikinAshiAlgorithm():
             end=yesterday
         )
 
-        _logger.info("got ticker bars")
+        _logger.info("got ticker bars for %s to %s", one_year_ago, yesterday)
 
         ha_calc = {} # store HA in here
         orders = [] # store trades in here
@@ -163,6 +163,7 @@ class HeikinAshiAlgorithm():
             # calc HA bars
             ha_calc[ticker] = []
             for index, bar in enumerate(bars[ticker]): # array of Bars
+                # _logger.debug("Ticker: %s, Bar date %s", ticker, bar.t)
                 if index == 0:
                     c = (bar.o + bar.h + bar.l + bar.c) / 4
                     o = (bar.o + bar.c) / 2
@@ -183,6 +184,9 @@ class HeikinAshiAlgorithm():
 
             latest_ha = ha_calc[ticker][-1]
             previous_ha = ha_calc[ticker][-2]
+
+            # _logger.debug("Latest HA values for ticker %s are %s", ticker, latest_ha)
+            # _logger.debug("Length of HA array is %d", len(ha_calc[ticker]))
 
             # calculate long buy booleans
 

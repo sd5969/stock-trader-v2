@@ -98,6 +98,8 @@ class TradeSimulator(Trader):
         elif order['side'] == 'sell':
             self.dollars_earned += order['qty'] * trade_price
 
+        _logger.debug("Successfully processed order %s %s %s", order['side'], order['qty'], order['symbol'])
+
         response['success'] = True
         response['order'] = Order(
             symbol=order['symbol'],
