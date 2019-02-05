@@ -41,6 +41,8 @@ def main():
         _logger.info("Market is closed, no trading will occur")
         return
 
+    data_api.reset_positions(tag='HA')
+
     date_range = daterange(START_DATE, END_DATE)
     for date_entry in date_range:
         _logger.info("Simulating Heikin-Ashi on %s", date_entry)
