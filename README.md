@@ -1,8 +1,8 @@
-# sentiment-stock-trader
+# stock-trader-v2
 
 ## Purpose
 
-This project is an attempt to classify stock-related tweets in order to predict buy/sell patterns.
+This project is another stock trader running a simple proprietary algorithm.
 
 ## Setup
 
@@ -21,12 +21,6 @@ Add your Twitter API data to a `.env` file in the `monitor` and `trade` director
 
 ```bash
 
-# Twitter creds
-SST_CONSUMER_KEY="key"
-SST_CONSUMER_SECRET="secret"
-SST_ACCESS_TOKEN="token"
-SST_ACCESS_TOKEN_SECRET="token secret"
-
 # MongoDB creds
 SST_DB_USER="user"
 SST_DB_PASSWORD="password"
@@ -40,12 +34,6 @@ AL_SECRET="secret"
 ```
 
 ## Execution
-
-Execute the tweet monitoring application:
-
-```bash
-python3 monitor/main.py
-```
 
 Execute the trade application:
 
