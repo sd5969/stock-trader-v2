@@ -11,7 +11,7 @@ def get_logger():
     """
     Returns logger for use
     """
-    return logging.getLogger("sentiment-stock-trader")
+    return logging.getLogger("stock-trader-v2")
 
 def init_logger(logger):
     """

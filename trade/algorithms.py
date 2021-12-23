@@ -11,99 +11,19 @@ load_dotenv(find_dotenv())
 
 _logger = logger.get_logger()
 
-class SentimentAlgorithm():
+
+
+
+
+
+
+
+
+
+
+class RegressionAlgorithm():
     """
-    Static class to store tweet sentiment trading algorithm
-    Note that tweet data is stored by the monitor streaming application
-    """
-
-    BUY_COUNT = 2
-    HOLD_COUNT = 5
-
-    @staticmethod
-    def execute(trader, data_api, trading_date):
-        """
-        Executes trade algorithm
-        """
-
-        yesterday = datetime.combine(
-            trading_date - timedelta(days=1),
-            datetime_time()
-        )
-
-        # get yesterday's sentiments
-
-        sentiments = data_api.get_sentiments_by_date(start=yesterday, end=yesterday)
-        tickers_dict = data_api.get_tickers_dict()
-
-        # identify tickers to hold based on best sentiments
-
-        tickers_to_hold = []
-        for i in range(min(len(sentiments), SentimentAlgorithm.HOLD_COUNT)):
-            ticker_id = sentiments[i]['_id']
-            tickers_to_hold.append(tickers_dict[ticker_id])
-
-        _logger.info("Tickers to hold: %s", tickers_to_hold)
-
-        # find old positions and sell them if we aren't holding
-
-        prev_positions = data_api.get_positions(tag='S')
-
-        sell_orders = []
-        tickers_held = []
-        for position in prev_positions:
-            if position['symbol'] not in tickers_to_hold:
-                sell_orders.append({
-                    'symbol': position['symbol'],
-                    'qty': position['qty'],
-                    'side': 'sell',
-                    'type': 'market',
-                    'time_in_force': 'day'
-                })
-            else:
-                tickers_held.append(position['symbol'])
-
-        orders = trader.submit_orders(sell_orders)
-        _logger.debug("S Sell Orders: " + str(orders))
-        trader.await_orders(orders.copy())
-        data_api.update_positions(tag='S', orders=orders)
-
-        _logger.info("All S sell orders (if any) complete")
-
-        # buy new positions based on sentiments
-
-        buy_orders = []
-        for ticker in tickers_to_hold:
-            if ticker not in tickers_held:
-                buy_orders.append({
-                    'symbol': ticker,
-                    'qty': SentimentAlgorithm.BUY_COUNT,
-                    'side': 'buy',
-                    'type': 'market',
-                    'time_in_force': 'day'
-                })
-        _logger.debug(buy_orders)
-
-        orders = trader.submit_orders(buy_orders)
-        trader.await_orders(orders.copy())
-        _logger.debug("S Buy Orders: " + str(orders))
-        data_api.update_positions(tag='S', orders=orders)
-
-        _logger.info("All S buy orders (if any) complete")
-
-
-
-
-
-
-
-
-
-
-
-class HeikinAshiAlgorithm():
-    """
-    Static class to store Heikin-Ashi trade algorithm
+    Static class to store regression-based trade algorithm
     """
 
     BUY_COUNT = 2
@@ -123,7 +43,7 @@ class HeikinAshiAlgorithm():
             # if ticker not in active_tickers:
             active_tickers.append(ticker)
 
-        active_positions = list(data_api.get_positions(tag='HA'))
+        active_positions = list(data_api.get_positions(tag='RA'))
         active_position_tickers = []
         active_positions_dict = {}
 

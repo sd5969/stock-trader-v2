@@ -35,7 +35,7 @@ class DataAPI():
         self.client = MongoClient("mongodb://" + _MONGODB_USER + ":" + _MONGODB_PASSWORD
         + "@" + _MONGODB_URI)
         _logger.info("connection to db successful")
-        self.database = self.client['sentiment-stock-trader']
+        self.database = self.client['stock-trader-v2']
         self.connected = True
 
     def get_tickers_dict(self):
@@ -79,60 +79,6 @@ class DataAPI():
             tickers_ids.append(ticker)
 
         return tickers_ids
-
-    def get_sentiments_by_date(self, start, end):
-        """
-        Get sentiments for a specific date
-        """
-
-        tickers = self.get_tickers_id()
-
-        # sentiments = self.database['sentiments'].find({
-        #     'date': {
-        #         '$gte': start,
-        #         '$lte': end
-        #     },
-        #     'ticker': {
-        #         '$in': tickers
-        #     }
-        # })
-        # _logger.info("got all sentiment data for active tickers")
-
-        sentiments = self.database['sentiments'].aggregate([{
-            '$match': {
-                'date': {
-                    '$gte': start,
-                    '$lte': end
-                },
-                'ticker': {
-                    '$in': tickers
-                }
-            }
-        }, {
-            '$group': {
-                '_id': '$ticker',
-                'sum_count': {
-                    '$sum': '$count'
-                },
-                'sum_sentiment': {
-                    '$sum': '$sentiment'
-                }
-            }
-        }, {
-            '$addFields': {
-                'average_sentiment': {
-                    '$divide': ['$sum_sentiment', '$sum_count']
-                }
-            }
-        }, {
-            '$sort': {
-                'average_sentiment': -1
-            }
-        }])
-        _logger.info("got all sentiment data for active tickers")
-
-
-        return list(sentiments)
 
     def update_positions(self, tag, orders):
         """

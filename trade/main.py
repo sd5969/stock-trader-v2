@@ -7,7 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 import logger
 from trader import Trader
 from datastore import DataAPI
-from algorithms import SentimentAlgorithm, HeikinAshiAlgorithm
+from algorithms import RegressionAlgorithm
 
 # load_dotenv(dotenv_path=os.path.join(os.getcwd(), '.env'))
 load_dotenv(find_dotenv())
@@ -30,8 +30,7 @@ def main():
         _logger.info("Market is closed, no trading will occur")
         return
 
-    SentimentAlgorithm.execute(trader, data_api, date.today())
-    HeikinAshiAlgorithm.execute(trader, data_api, date.today())
+    RegressionAlgorithm.execute(trader, data_api, date.today())
 
 if __name__ == "__main__":
     # calling main function
